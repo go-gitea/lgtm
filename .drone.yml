@@ -4,7 +4,7 @@ workspace:
 
 pipeline:
   test:
-    image: webhippie/golang:edge
+    image: webhippie/golang:${GO_VERSION}
     pull: true
     environment:
       CGO_ENABLED: 1
@@ -15,16 +15,16 @@ pipeline:
       - make test
       - make build
 
-  mysql:
-    image: webhippie/golang:edge
+  test-mysql:
+    image: webhippie/golang:${GO_VERSION}
     pull: true
     commands:
      - make test-mysql
     when:
       event: push
 
-  pgsql:
-    image: webhippie/golang:edge
+  test-pgsql:
+    image: webhippie/golang:${GO_VERSION}
     pull: true
     commands:
      - make test-pgsql
@@ -39,28 +39,37 @@ pipeline:
     when:
       event: [ push, tag ]
       branch: [ master, refs/tags/* ]
+      matrix:
+        GO_VERSION: 1.7
 
   coverage:
     image: plugins/coverage
     server: https://coverage.gitea.io
+    when:
+      matrix:
+        GO_VERSION: 1.7
 
-  docker1:
+  docker:
     image: plugins/docker
     repo: gitea/lgtm
     tags: [ '${TAG}' ]
     when:
       event: tag
       branch: refs/tags/*
+      matrix:
+        GO_VERSION: 1.7
 
-  docker2:
+  docker:
     image: plugins/docker
     repo: gitea/lgtm
     tags: [ 'latest' ]
     when:
       event: push
       branch: master
+      matrix:
+        GO_VERSION: 1.7
 
-  release1:
+  release:
     image: plugins/s3
     path_style: true
     source: dist/release/
@@ -68,8 +77,10 @@ pipeline:
     when:
       event: push
       branch: master
+      matrix:
+        GO_VERSION: 1.7
 
-  release2:
+  release:
     image: plugins/s3
     path_style: true
     source: dist/release/
@@ -77,8 +88,10 @@ pipeline:
     when:
       event: tag
       branch: refs/tags/*
+      matrix:
+        GO_VERSION: 1.7
 
-  release3:
+  latest:
     image: plugins/s3
     path_style: true
     source: dist/latest/
@@ -86,6 +99,8 @@ pipeline:
     when:
       event: tag
       branch: refs/tags/*
+      matrix:
+        GO_VERSION: 1.7
 
   github:
     image: plugins/github-release
@@ -94,9 +109,11 @@ pipeline:
     when:
       event: tag
       branch: refs/tags/*
+      matrix:
+        GO_VERSION: 1.7
 
 services:
-  mysqlsvc:
+  mysql:
     image: mysql:5.7
     environment:
       - MYSQL_DATABASE=test
@@ -104,9 +121,14 @@ services:
     when:
       event: push
 
-  pgsqlsvc:
+  pgsql:
     image: postgres:9.5
     environment:
       - POSTGRES_DB=test
     when:
       event: push
+
+matrix:
+  GO_VERSION:
+    - 1.6
+    - 1.7
