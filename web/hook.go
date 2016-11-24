@@ -112,7 +112,7 @@ func Hook(c *gin.Context) {
 
 	oriLabels, err := remote.GetIssueLabels(c, user, repo, hook.Issue.Number)
 	if err != nil {
-		log.Errorf("Error remove old labels for %s pr %d. %s", repo.Slug, hook.Issue.Number, err)
+		log.Errorf("Error retrieving labels for %s pr %d. %s", repo.Slug, hook.Issue.Number, err)
 	}
 
 	var hasLabel bool
