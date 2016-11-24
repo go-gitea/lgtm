@@ -266,6 +266,27 @@ func (_m *Remote) GetUserToken(_a0 string) (string, error) {
 	return r0, r1
 }
 
+// GetIssueLabels get all the labels of an issue
+func (_m *Remote) GetIssueLabels(user *model.User, repo *model.Repo, number int) ([]string, error) {
+	ret := _m.Called(user, repo, number)
+
+	var r0 []string
+	if rf, ok := ret.Get(0).(func(*model.User, *model.Repo, int) []string); ok {
+		r0 = rf(user, repo, number)
+	} else {
+		r0 = ret.Get(0).([]string)
+	}
+
+	var r1 error
+	if rf, ok := ret.Get(1).(func(*model.User, *model.Repo, int) error); ok {
+		r1 = rf(user, repo, number)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
 // RemoveIssueLabels provides a mock function with given fields: user, repo, number, labels
 func (_m *Remote) RemoveIssueLabels(user *model.User, repo *model.Repo, number int, labels []string) error {
 	ret := _m.Called(user, repo, number, labels)

@@ -56,6 +56,9 @@ type Remote interface {
 
 	// AddIssueLabels add the labels to an issue
 	AddIssueLabels(user *model.User, repo *model.Repo, number int, lables []string) error
+
+	// GetIssueLabels get all the labels of an issue
+	GetIssueLabels(user *model.User, repo *model.Repo, number int) ([]string, error)
 }
 
 // GetUser authenticates a user with the remote system.
@@ -127,6 +130,11 @@ func GetHook(c context.Context, r *http.Request) (*model.Hook, error) {
 // RemoveIssueLabels remove the labels of some issue.
 func RemoveIssueLabels(c context.Context, user *model.User, repo *model.Repo, number int, labels []string) error {
 	return FromContext(c).RemoveIssueLabels(user, repo, number, labels)
+}
+
+// GetIssueLabels get all the labels of an issue
+func GetIssueLabels(c context.Context, user *model.User, repo *model.Repo, number int) ([]string, error) {
+	return FromContext(c).GetIssueLabels(user, repo, number)
 }
 
 // AddIssueLabels writes labels for the requirements of reviews.

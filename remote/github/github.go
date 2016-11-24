@@ -8,9 +8,9 @@ import (
 	"time"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/google/go-github/github"
 	"github.com/go-gitea/lgtm/model"
 	"github.com/go-gitea/lgtm/shared/httputil"
+	"github.com/google/go-github/github"
 	"golang.org/x/oauth2"
 )
 
@@ -202,6 +202,21 @@ func (g *Github) AddIssueLabels(user *model.User, repo *model.Repo, number int, 
 	client := setupClient(g.API, user.Token)
 	_, _, err := client.Issues.AddLabelsToIssue(repo.Owner, repo.Name, number, labels)
 	return err
+}
+
+// GetIssueLabels get all labels of issue
+func (g *Github) GetIssueLabels(user *model.User, repo *model.Repo, number int) ([]string, error) {
+	client := setupClient(g.API, user.Token)
+	labels, _, err := client.Issues.ListLabelsByIssue(repo.Owner, repo.Name, number, &github.ListOptions{})
+	if err != nil {
+		return nil, err
+	}
+	var res = make([]string, len(labels))
+	for i := 0; i < len(labels); i++ {
+		res[i] = labels[i].String()
+	}
+
+	return res, err
 }
 
 // SetHook injects a webhook through the API.
