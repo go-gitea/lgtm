@@ -101,11 +101,8 @@ func Hook(c *gin.Context) {
 		idx = 2
 	}
 
-	var ns = make([]string, len(labels))
-	copy(ns, labels)
-
 	// remove old labels
-	err = remote.RemoveIssueLabels(c, user, repo, hook.Issue.Number, append(ns[:idx], ns[idx+1:]...))
+	err = remote.RemoveIssueLabels(c, user, repo, hook.Issue.Number, labels[:idx])
 	if err != nil {
 		log.Errorf("Error remove old labels for %s pr %d. %s", repo.Slug, hook.Issue.Number, err)
 	}
