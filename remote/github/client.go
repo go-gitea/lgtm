@@ -36,8 +36,8 @@ func NewClient(uri string) *Client {
 // authenticates all outbound requests with the given token.
 func NewClientToken(uri, token string) *Client {
 	config := new(oauth2.Config)
-	auther := config.Client(oauth2.NoContext, &oauth2.Token{AccessToken: token})
-	return &Client{auther, uri}
+	author := config.Client(oauth2.NoContext, &oauth2.Token{AccessToken: token})
+	return &Client{author, uri}
 }
 
 // SetClient sets the default http client. This should be

@@ -5,9 +5,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/Sirupsen/logrus"
 	"github.com/go-gitea/lgtm/store"
 	"github.com/go-gitea/lgtm/store/migration"
-	"github.com/Sirupsen/logrus"
 	"github.com/rubenv/sql-migrate"
 	"github.com/russross/meddler"
 
