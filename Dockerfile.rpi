@@ -1,4 +1,4 @@
-FROM alpine:edge
+FROM hypriot/rpi-alpine-scratch:edge
 MAINTAINER Thomas Boerger <thomas@webhippie.de>
 
 EXPOSE 8000
