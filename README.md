@@ -39,6 +39,23 @@ make clean build
 bin/lgtm -h
 ```
 
+### Docker
+
+A Docker Image is available for easy deployment. It can be run locally or on a dedicated Server as follows:
+
+```
+docker run --name lgtm -v /my/host/path:/var/lib/lgtm:z -e GITHUB_CLIENT= -e GITHUB_SECRET= -p 8000:8000 gitea/lgtm
+```
+
+To Fill the Environment Variables `GITHUB_CLIENT` and `GITHUB_SECRET`, create new OAuth Application [here](https://github.com/settings/applications/new)
+
+* Homepage URL = protocol://host:port (f.e. http://localhost:8000)
+* Authorization callback URL = protocol://host:port/login (f.e. http://localhost:8000/login)
+
+
+To Build the Image by yourself please refere to the [Dockerfile](https://github.com/go-gitea/lgtm/blob/master/Dockerfile) and the [Drone Configuration](https://github.com/go-gitea/lgtm/blob/master/.drone.yml).
+
+
 ## Contributing
 
 Fork -> Patch -> Push -> Pull Request
