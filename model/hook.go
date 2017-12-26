@@ -5,4 +5,5 @@ type Hook struct {
 	Repo    *Repo
 	Issue   *Issue
 	Comment *Comment
+	Review  *Review
 }

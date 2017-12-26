@@ -14,10 +14,9 @@ import (
 )
 
 var (
-	addr = envflag.String("SERVER_ADDR", ":8000", "")
-	cert = envflag.String("SERVER_CERT", "", "")
-	key  = envflag.String("SERVER_KEY", "", "")
-
+	addr  = envflag.String("SERVER_ADDR", ":8000", "")
+	cert  = envflag.String("SERVER_CERT", "", "")
+	key   = envflag.String("SERVER_KEY", "", "")
 	debug = envflag.Bool("DEBUG", false, "")
 )
 

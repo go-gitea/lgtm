@@ -18,7 +18,10 @@ const (
 	pathRepos  = "%sapi/user/repos"
 	pathRepo   = "%sapi/repos/%s"
 	pathConf   = "%sapi/repos/%s/maintainers"
-	pathBranch = "%srepos/%s/%s/branches/%s"
+	pathBranch = "%srepos/%s/%s/branches/%s/protection"
+
+	// protected branch
+	pathBranchStatusCheck = "%srepos/%s/%s/branches/%s/protection/required_status_checks"
 )
 
 // Client represents the simple HTTP client for the GitHub API.
@@ -47,17 +50,23 @@ func (c *Client) SetClient(client *http.Client) {
 	c.client = client
 }
 
-// Branch retrives informations about a branch from the GitHub API.
-func (c *Client) Branch(owner, name, branch string) (*Branch, error) {
-	out := new(Branch)
+// UpdateBranch enables the branch protection for a specific branch.
+func (c *Client) UpdateBranch(owner, name, branch string, in *Branch) error {
 	uri := fmt.Sprintf(pathBranch, c.base, owner, name, branch)
+	return c.put(uri, in, nil)
+}
+
+// GetBranchStatusCheck retrives informations about status checks of protected branch from the GitHub API.
+func (c *Client) GetBranchStatusCheck(owner, name, branch string) (*RequiredStatusChecks, error) {
+	out := new(RequiredStatusChecks)
+	uri := fmt.Sprintf(pathBranchStatusCheck, c.base, owner, name, branch)
 	err := c.get(uri, out)
 	return out, err
 }
 
-// BranchProtect enables the branch protection for a specific branch.
-func (c *Client) BranchProtect(owner, name, branch string, in *Branch) error {
-	uri := fmt.Sprintf(pathBranch, c.base, owner, name, branch)
+// PatchBranchStatusCheck update required status checks of protected branchEnabled for GitHub Apps
+func (c *Client) PatchBranchStatusCheck(owner, name, branch string, in *RequiredStatusChecks) error {
+	uri := fmt.Sprintf(pathBranchStatusCheck, c.base, owner, name, branch)
 	return c.patch(uri, in, nil)
 }
 
