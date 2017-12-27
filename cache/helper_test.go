@@ -31,7 +31,7 @@ func TestHelper(t *testing.T) {
 		})
 
 		g.It("Should get permissions from remote", func() {
-			r.On("GetPerm", fakeUser, fakeRepo.Owner, fakeRepo.Name).Return(fakePerm, nil).Once()
+			r.On("GetPerm", c, fakeUser, fakeRepo.Owner, fakeRepo.Name).Return(fakePerm, nil).Once()
 			p, err := GetPerm(c, fakeUser, fakeRepo.Owner, fakeRepo.Name)
 			g.Assert(p).Equal(fakePerm)
 			g.Assert(err).Equal(nil)
@@ -45,14 +45,14 @@ func TestHelper(t *testing.T) {
 			)
 
 			Set(c, key, fakePerm)
-			r.On("GetPerm", fakeUser, fakeRepo.Owner, fakeRepo.Name).Return(nil, errFake).Once()
+			r.On("GetPerm", c, fakeUser, fakeRepo.Owner, fakeRepo.Name).Return(nil, errFake).Once()
 			p, err := GetPerm(c, fakeUser, fakeRepo.Owner, fakeRepo.Name)
 			g.Assert(p).Equal(fakePerm)
 			g.Assert(err).Equal(nil)
 		})
 
 		g.It("Should get permissions error", func() {
-			r.On("GetPerm", fakeUser, fakeRepo.Owner, fakeRepo.Name).Return(nil, errFake).Once()
+			r.On("GetPerm", c, fakeUser, fakeRepo.Owner, fakeRepo.Name).Return(nil, errFake).Once()
 			p, err := GetPerm(c, fakeUser, fakeRepo.Owner, fakeRepo.Name)
 			g.Assert(p == nil).IsTrue()
 			g.Assert(err).Equal(errFake)
@@ -60,7 +60,7 @@ func TestHelper(t *testing.T) {
 
 		g.It("Should set and get repos", func() {
 
-			r.On("GetRepos", fakeUser).Return(fakeRepos, nil).Once()
+			r.On("GetRepos", c, fakeUser).Return(fakeRepos, nil).Once()
 			p, err := GetRepos(c, fakeUser)
 			g.Assert(p).Equal(fakeRepos)
 			g.Assert(err).Equal(nil)
@@ -72,21 +72,21 @@ func TestHelper(t *testing.T) {
 			)
 
 			Set(c, key, fakeRepos)
-			r.On("GetRepos", fakeUser).Return(nil, errFake).Once()
+			r.On("GetRepos", c, fakeUser).Return(nil, errFake).Once()
 			p, err := GetRepos(c, fakeUser)
 			g.Assert(p).Equal(fakeRepos)
 			g.Assert(err).Equal(nil)
 		})
 
 		g.It("Should get repos error", func() {
-			r.On("GetRepos", fakeUser).Return(nil, errFake).Once()
+			r.On("GetRepos", c, fakeUser).Return(nil, errFake).Once()
 			p, err := GetRepos(c, fakeUser)
 			g.Assert(p == nil).IsTrue()
 			g.Assert(err).Equal(errFake)
 		})
 
 		g.It("Should set and get teams", func() {
-			r.On("GetTeams", fakeUser).Return(fakeTeams, nil).Once()
+			r.On("GetTeams", c, fakeUser).Return(fakeTeams, nil).Once()
 			p, err := GetTeams(c, fakeUser)
 			g.Assert(p).Equal(fakeTeams)
 			g.Assert(err).Equal(nil)
@@ -98,21 +98,21 @@ func TestHelper(t *testing.T) {
 			)
 
 			Set(c, key, fakeTeams)
-			r.On("GetTeams", fakeUser).Return(nil, errFake).Once()
+			r.On("GetTeams", c, fakeUser).Return(nil, errFake).Once()
 			p, err := GetTeams(c, fakeUser)
 			g.Assert(p).Equal(fakeTeams)
 			g.Assert(err).Equal(nil)
 		})
 
 		g.It("Should get team error", func() {
-			r.On("GetTeams", fakeUser).Return(nil, errFake).Once()
+			r.On("GetTeams", c, fakeUser).Return(nil, errFake).Once()
 			p, err := GetTeams(c, fakeUser)
 			g.Assert(p == nil).IsTrue()
 			g.Assert(err).Equal(errFake)
 		})
 
 		g.It("Should set and get members", func() {
-			r.On("GetMembers", fakeUser, "drone").Return(fakeMembers, nil).Once()
+			r.On("GetMembers", c, fakeUser, "drone").Return(fakeMembers, nil).Once()
 			p, err := GetMembers(c, fakeUser, "drone")
 			g.Assert(p).Equal(fakeMembers)
 			g.Assert(err).Equal(nil)
@@ -122,14 +122,14 @@ func TestHelper(t *testing.T) {
 			key := "members:drone"
 
 			Set(c, key, fakeMembers)
-			r.On("GetMembers", fakeUser, "drone").Return(nil, errFake).Once()
+			r.On("GetMembers", c, fakeUser, "drone").Return(nil, errFake).Once()
 			p, err := GetMembers(c, fakeUser, "drone")
 			g.Assert(p).Equal(fakeMembers)
 			g.Assert(err).Equal(nil)
 		})
 
 		g.It("Should get member error", func() {
-			r.On("GetMembers", fakeUser, "drone").Return(nil, errFake).Once()
+			r.On("GetMembers", c, fakeUser, "drone").Return(nil, errFake).Once()
 			p, err := GetMembers(c, fakeUser, "drone")
 			g.Assert(p == nil).IsTrue()
 			g.Assert(err).Equal(errFake)
