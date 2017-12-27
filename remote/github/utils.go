@@ -5,6 +5,7 @@ import (
 	"net/url"
 
 	"github.com/google/go-github/github"
+	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 )
 
@@ -20,8 +21,8 @@ func setupClient(rawurl, accessToken string) *github.Client {
 // GetHook is a helper function that retrieves a hook by
 // hostname. To do this, it will retrieve a list of all hooks
 // and iterate through the list.
-func GetHook(client *github.Client, owner, name, rawurl string) (*github.Hook, error) {
-	hooks, _, err := client.Repositories.ListHooks(owner, name, nil)
+func GetHook(c context.Context, client *github.Client, owner, name, rawurl string) (*github.Hook, error) {
+	hooks, _, err := client.Repositories.ListHooks(c, owner, name, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +42,7 @@ func GetHook(client *github.Client, owner, name, rawurl string) (*github.Hook, e
 			continue
 		}
 		if newurl.Host == oldurl.Host {
-			return &hook, nil
+			return hook, nil
 		}
 	}
 	return nil, nil
@@ -49,55 +50,61 @@ func GetHook(client *github.Client, owner, name, rawurl string) (*github.Hook, e
 
 // DeleteHook is a helper function that deletes a post-commit hook
 // for the specified repository.
-func DeleteHook(client *github.Client, owner, name, url string) error {
-	hook, err := GetHook(client, owner, name, url)
+func DeleteHook(c context.Context, client *github.Client, owner, name, url string) error {
+	hook, err := GetHook(c, client, owner, name, url)
 	if err != nil {
 		return err
 	}
 	if hook == nil {
 		return nil
 	}
-	_, err = client.Repositories.DeleteHook(owner, name, *hook.ID)
+	_, err = client.Repositories.DeleteHook(c, owner, name, *hook.ID)
 	return err
 }
 
 // CreateHook is a helper function that creates a post-commit hook
 // for the specified repository.
-func CreateHook(client *github.Client, owner, name, url string) (*github.Hook, error) {
+func CreateHook(c context.Context, client *github.Client, owner, name, url string) (*github.Hook, error) {
 	var hook = new(github.Hook)
 	hook.Name = github.String("web")
-	hook.Events = []string{"issue_comment"}
+	hook.Events = []string{"issue_comment", "pull_request_review"}
 	hook.Config = map[string]interface{}{}
 	hook.Config["url"] = url
 	hook.Config["content_type"] = "json"
-	created, _, err := client.Repositories.CreateHook(owner, name, hook)
+	created, _, err := client.Repositories.CreateHook(c, owner, name, hook)
 	return created, err
 }
 
 // GetFile is a helper function that retrieves a file from
 // GitHub and returns its contents in byte array format.
-func GetFile(client *github.Client, owner, name, path, ref string) ([]byte, error) {
+func GetFile(c context.Context, client *github.Client, owner, name, path, ref string) ([]byte, error) {
 	var opts = new(github.RepositoryContentGetOptions)
 	opts.Ref = ref
-	content, _, _, err := client.Repositories.GetContents(owner, name, path, opts)
+	content, _, _, err := client.Repositories.GetContents(c, owner, name, path, opts)
 	if err != nil {
 		return nil, err
 	}
-	return content.Decode()
+	str, err := content.GetContent()
+
+	if err != nil {
+		return nil, err
+	}
+
+	return []byte(str), nil
 }
 
 // GetUserRepos is a helper function that returns a list of
 // all user repositories. Paginated results are aggregated into
 // a single list.
-func GetUserRepos(client *github.Client) ([]github.Repository, error) {
-	var repos []github.Repository
+func GetUserRepos(c context.Context, client *github.Client) ([]*github.Repository, error) {
+	var repos []*github.Repository
 	var opts = github.RepositoryListOptions{}
 	opts.PerPage = 100
 	opts.Page = 1
 
 	// loop through user repository list
 	for opts.Page > 0 {
-		list, resp, err := client.Repositories.List("", &opts)
+		list, resp, err := client.Repositories.List(c, "", &opts)
 		if err != nil {
 			return nil, err
 		}

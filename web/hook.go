@@ -86,7 +86,15 @@ func Hook(c *gin.Context) {
 		c.String(500, "Error retrieving comments. %s.", err)
 		return
 	}
-	approvers := getApprovers(config, maintainer, hook.Issue, comments)
+
+	reviews, err := remote.GetReviews(c, user, repo, hook.Issue.Number)
+	if err != nil {
+		log.Errorf("Error retrieving reviews for %s pr %d. %s", repo.Slug, hook.Issue.Number, err)
+		c.String(500, "Error retrieving comments. %s.", err)
+		return
+	}
+
+	approvers := getApprovers(config, maintainer, hook.Issue, comments, reviews)
 	approved := len(approvers) >= config.Approvals
 
 	err = remote.SetStatus(c, user, repo, hook.Issue.Number, len(approvers), config.Approvals)
@@ -149,7 +157,7 @@ func Hook(c *gin.Context) {
 
 // getApprovers is a helper function that analyzes the list of comments
 // and returns the list of approvers.
-func getApprovers(config *model.Config, maintainer *model.Maintainer, issue *model.Issue, comments []*model.Comment) []*model.Person {
+func getApprovers(config *model.Config, maintainer *model.Maintainer, issue *model.Issue, comments []*model.Comment, reviews []*model.Review) []*model.Person {
 	approverm := map[string]bool{}
 	approvers := []*model.Person{}
 
@@ -176,6 +184,28 @@ func getApprovers(config *model.Config, maintainer *model.Maintainer, issue *mod
 		// verify the comment matches the approval pattern
 		if matcher.MatchString(comment.Body) {
 			approverm[comment.Author] = true
+			approvers = append(approvers, person)
+		}
+	}
+
+	for _, review := range reviews {
+		// cannot lgtm your own pull request
+		if config.SelfApprovalOff && review.Author == issue.Author {
+			continue
+		}
+		// the user must be a valid maintainer of the project
+
+		person, ok := maintainer.People[review.Author]
+		if !ok {
+			continue
+		}
+		// the same author can't approve something twice
+		if _, ok := approverm[review.Author]; ok {
+			continue
+		}
+		// verify the comment matches the approval pattern
+		if review.IsApproved() {
+			approverm[review.Author] = true
 			approvers = append(approvers, person)
 		}
 	}

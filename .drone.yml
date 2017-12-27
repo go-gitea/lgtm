@@ -7,8 +7,8 @@ pipeline:
     image: webhippie/golang:edge
     pull: true
     environment:
-      CGO_ENABLED: 1
-      TAGS:
+      GOPATH: /srv/app
+      CGO_ENABLED: "1"
     commands:
       - make clean
       - make vet
@@ -55,7 +55,6 @@ pipeline:
     tags: [ '${TAG}' ]
     when:
       event: [ tag ]
-      branch: [ refs/tags/* ]
 
   docker:
     image: plugins/docker
@@ -83,7 +82,6 @@ pipeline:
     target: /lgtm/$$TAG
     when:
       event: [ tag ]
-      branch: [ refs/tags/* ]
 
   github:
     image: plugins/github-release
@@ -91,14 +89,12 @@ pipeline:
       - dist/release/*
     when:
       event: [ tag ]
-      branch: [ refs/tags/* ]
 
   discord:
     image: appleboy/drone-discord
     webhook_id: ${WEBHOOK_ID}
     webhook_token: ${WEBHOOK_TOKEN}
     when:
-      event: [ push, tag, pull_request ]
       status: [ changed, failure ]
 
 services:
