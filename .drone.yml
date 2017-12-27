@@ -6,6 +6,7 @@ pipeline:
   test:
     image: webhippie/golang:edge
     pull: true
+    group: testing
     environment:
       GOPATH: /srv/app
       CGO_ENABLED: "1"
@@ -21,16 +22,18 @@ pipeline:
   test-mysql:
     image: webhippie/golang:edge
     pull: true
+    group: testing
     commands:
-     - make test-mysql
+      - make test-mysql
     when:
       event: [ push ]
 
   test-pgsql:
     image: webhippie/golang:edge
     pull: true
+    group: testing
     commands:
-     - make test-pgsql
+      - make test-pgsql
     when:
       event: [ push ]
 
@@ -92,8 +95,6 @@ pipeline:
 
   discord:
     image: appleboy/drone-discord
-    webhook_id: ${WEBHOOK_ID}
-    webhook_token: ${WEBHOOK_TOKEN}
     when:
       status: [ changed, failure ]
 

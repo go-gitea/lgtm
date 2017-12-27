@@ -65,11 +65,11 @@ check: test
 
 .PHONY: test-mysql
 test-mysql:
-	DATABASE_DRIVER="mysql" DATABASE_DATASOURCE="root@tcp(127.0.0.1:3306)/test?parseTime=true" go test -v -cover $(IMPORT)/store/datastore
+	DATABASE_DRIVER="mysql" DATABASE_DATASOURCE="root@tcp(mysql:3306)/test?parseTime=true" go test -v -cover $(IMPORT)/store/datastore
 
 .PHONY: test-pgsql
 test-pgsql:
-	DATABASE_DRIVER="postgres" DATABASE_DATASOURCE="postgres://postgres@127.0.0.1:5432/postgres?sslmode=disable" go test -v -cover $(IMPORT)/store/datastore
+	DATABASE_DRIVER="postgres" DATABASE_DATASOURCE="postgres://postgres@pgsql:5432/postgres?sslmode=disable" go test -v -cover $(IMPORT)/store/datastore
 
 .PHONY: install
 install: $(wildcard *.go)
