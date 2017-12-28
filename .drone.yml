@@ -65,7 +65,11 @@ pipeline:
       event: [ push, tag ]
 
   release:
-    image: plugins/s3
+    image: plugins/s3:1
+    pull: true
+    secrets: [ aws_access_key_id, aws_secret_access_key ]
+    bucket: releases
+    endpoint: https://storage.gitea.io
     path_style: true
     strip_prefix: dist/release/
     source: dist/release/*
@@ -75,16 +79,22 @@ pipeline:
       branch: [ master ]
 
   release:
-    image: plugins/s3
+    image: plugins/s3:1
+    pull: true
+    secrets: [ aws_access_key_id, aws_secret_access_key ]
+    bucket: releases
+    endpoint: https://storage.gitea.io
     path_style: true
     strip_prefix: dist/release/
     source: dist/release/*
-    target: /lgtm/$$TAG
+    target: /lgtm/${DRONE_TAG##v}
     when:
       event: [ tag ]
 
   github:
-    image: plugins/github-release
+    image: plugins/github-release:1
+    pull: true
+    secrets: [ github_token ]
     files:
       - dist/release/*
     when:
@@ -92,7 +102,9 @@ pipeline:
 
   discord:
     image: appleboy/drone-discord
+    secrets: [ discord_webhook_id, discord_webhook_token ]
     when:
+      event: [ push, tag, pull_request ]
       status: [ changed, failure ]
 
 services:
