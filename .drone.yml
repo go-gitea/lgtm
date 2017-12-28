@@ -42,7 +42,7 @@ pipeline:
     name: ${DRONE_REPO}
     secrets: [ codecov_token ]
     when:
-      event: [ push, tag, pull_request ]
+      event: [ push, pull_request ]
 
   updater:
     image: karalabe/xgo-latest:latest
