@@ -10,13 +10,6 @@ func (e Error) String() string { return e.Message }
 
 // Branch represents a branch, including protection.
 type Branch struct {
-	// Protection struct {
-	// 	Enabled bool `json:"enabled"`
-	// 	Checks  struct {
-	// 		Enforcement string   `json:"enforcement_level"`
-	// 		Contexts    []string `json:"contexts"`
-	// 	} `json:"required_status_checks"`
-	// } `json:"protection"`
 	RequiredStatusChecks       *RequiredStatusChecks       `json:"required_status_checks"`
 	EnforceAdmins              bool                        `json:"enforce_admins"`
 	RequiredPullRequestReviews *RequiredPullRequestReviews `json:"required_pull_request_reviews"`

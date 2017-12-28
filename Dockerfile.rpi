@@ -1,5 +1,5 @@
 FROM hypriot/rpi-alpine-scratch:edge
-MAINTAINER Thomas Boerger <thomas@webhippie.de>
+LABEL maintainer="The Gitea Authors"
 
 EXPOSE 8000
 
