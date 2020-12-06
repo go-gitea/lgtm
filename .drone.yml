@@ -9,9 +9,9 @@ platform:
 steps:
 - name: test
   pull: always
-  image: golang:1.15-alpine
+  image: alpine:3.12
   commands:
-  - apk add --no-cache make git gcc build-base
+  - apk add --no-cache make go
   - make clean
   - make vet
   #- make lint
@@ -31,9 +31,9 @@ steps:
 
 - name: test-mysql
   pull: always
-  image: golang:1.15-alpine
+  image: alpine:3.12
   commands:
-  - apk add --no-cache make git gcc build-base
+  - apk add --no-cache make go
   - make test-mysql
   settings:
     group: testing
@@ -44,9 +44,9 @@ steps:
 
 - name: test-pgsql
   pull: always
-  image: golang:1.15-alpine
+  image: alpine:3.12
   commands:
-  - apk add --no-cache make git gcc build-base
+  - apk add --no-cache make go
   - make test-pgsql
   settings:
     group: testing
@@ -68,9 +68,9 @@ steps:
 
 - name: build
   pull: always
-  image: golang:1.15-alpine
+  image: alpine:3.12
   commands:
-  - apk add --no-cache make git gcc build-base
+  - apk add --no-cache make go
   - make clean build
   settings:
     group: release
