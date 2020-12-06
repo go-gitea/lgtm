@@ -67,7 +67,6 @@ steps:
     - push
     - pull_request
 
-steps:
 - name: build
   pull: always
   image: golang:1.15
