@@ -67,9 +67,27 @@ steps:
     - push
     - pull_request
 
+steps:
+- name: build
+  pull: always
+  image: golang:1.15
+  commands:
+  - make build
+  settings:
+    group: release
+  environment:
+    GOPROXY: https://goproxy.cn # proxy.golang.org is blocked in China, this proxy is not
+    GOSUMDB: sum.golang.org
+    CGO_ENABLED: 1
+  when:
+    event:
+    - push
+    - tag
+    - pull_request
+
 - name: docker
   pull: always
-  image: plugins/docker:17.05
+  image: plugins/docker:latest
   settings:
     group: release
     repo: gitea/lgtm
