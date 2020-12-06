@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 	"time"
 
 	"github.com/go-gitea/lgtm/model"
 	"github.com/go-gitea/lgtm/shared/httputil"
-	"github.com/google/go-github/github"
+	"github.com/google/go-github/v33/github"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
@@ -99,25 +98,9 @@ func (g *Github) GetTeams(c context.Context, user *model.User) ([]*model.Team, e
 }
 
 // GetMembers retrieves members from the API.
-func (g *Github) GetMembers(c context.Context, user *model.User, team string) ([]*model.Member, error) {
+func (g *Github) GetMembers(c context.Context, user *model.User, org string) ([]*model.Member, error) {
 	client := setupClient(g.API, user.Token)
-	teams, _, err := client.Organizations.ListTeams(c, team, &github.ListOptions{PerPage: 100})
-	if err != nil {
-		return nil, fmt.Errorf("Error accessing team list. %s", err)
-	}
-	var id int
-	for _, team := range teams {
-		if strings.ToLower(*team.Name) == "maintainers" {
-			id = *team.ID
-			break
-		}
-	}
-	if id == 0 {
-		return nil, fmt.Errorf("Error finding approvers team. %s", err)
-	}
-	opts := github.OrganizationListTeamMembersOptions{}
-	opts.PerPage = 100
-	teammates, _, err := client.Organizations.ListTeamMembers(c, id, &opts)
+	teammates, _, err := client.Teams.ListTeamMembersBySlug(c, org, "maintainers", &github.TeamListTeamMembersOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("Error fetching team members. %s", err)
 	}
@@ -315,9 +298,9 @@ func (g *Github) DelHook(c context.Context, user *model.User, repo *model.Repo, 
 func (g *Github) GetComments(c context.Context, u *model.User, r *model.Repo, num int) ([]*model.Comment, error) {
 	client := setupClient(g.API, u.Token)
 
-	opts := github.IssueListCommentsOptions{Direction: "desc", Sort: "created"}
-	opts.PerPage = 100
-	apiComments, _, err := client.Issues.ListComments(c, r.Owner, r.Name, num, &opts)
+	apiComments, _, err := client.Issues.ListComments(c, r.Owner, r.Name, num,
+		&github.IssueListCommentsOptions{ListOptions: github.ListOptions{PerPage: 100}},
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -328,6 +311,9 @@ func (g *Github) GetComments(c context.Context, u *model.User, r *model.Repo, nu
 			Body:   *comment.Body,
 		})
 	}
+
+	// TODO: make sure they are sorted Direction: "desc", Sort: "created"
+
 	return comments, nil
 }
 

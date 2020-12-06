@@ -38,11 +38,10 @@ github.com/go-sql-driver/mysql
 # github.com/golang/protobuf v1.4.3
 ## explicit
 github.com/golang/protobuf/proto
-# github.com/google/go-github v14.0.1-0.20171221173707-0c3b302de2a6+incompatible
+# github.com/google/go-github/v33 v33.0.0
 ## explicit
-github.com/google/go-github/github
-# github.com/google/go-querystring v0.0.0-20151028211038-2a60fc2ba6c1
-## explicit
+github.com/google/go-github/v33/github
+# github.com/google/go-querystring v1.0.0
 github.com/google/go-querystring/query
 # github.com/ianschenck/envflag v0.0.0-20140720210342-9111d830d133
 ## explicit
@@ -101,6 +100,13 @@ github.com/ugorji/go/codec
 ## explicit
 # golang.org/x/crypto v0.0.0-20201203163018-be400aefbc4c
 ## explicit
+golang.org/x/crypto/cast5
+golang.org/x/crypto/openpgp
+golang.org/x/crypto/openpgp/armor
+golang.org/x/crypto/openpgp/elgamal
+golang.org/x/crypto/openpgp/errors
+golang.org/x/crypto/openpgp/packet
+golang.org/x/crypto/openpgp/s2k
 golang.org/x/crypto/sha3
 # golang.org/x/net v0.0.0-20190404232315-eb5bcb51f2a3
 ## explicit

@@ -12,8 +12,7 @@ require (
 	github.com/go-playground/validator/v10 v10.4.1 // indirect
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/golang/protobuf v1.4.3 // indirect
-	github.com/google/go-github v14.0.1-0.20171221173707-0c3b302de2a6+incompatible
-	github.com/google/go-querystring v0.0.0-20151028211038-2a60fc2ba6c1 // indirect
+	github.com/google/go-github/v33 v33.0.0
 	github.com/ianschenck/envflag v0.0.0-20140720210342-9111d830d133
 	github.com/joho/godotenv v1.3.0
 	github.com/json-iterator/go v1.1.10 // indirect

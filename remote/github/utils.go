@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/url"
 
-	"github.com/google/go-github/github"
+	"github.com/google/go-github/v33/github"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"
 )
@@ -66,7 +66,6 @@ func DeleteHook(c context.Context, client *github.Client, owner, name, url strin
 // for the specified repository.
 func CreateHook(c context.Context, client *github.Client, owner, name, url string) (*github.Hook, error) {
 	var hook = new(github.Hook)
-	hook.Name = github.String("web")
 	hook.Events = []string{"issue_comment", "pull_request_review"}
 	hook.Config = map[string]interface{}{}
 	hook.Config["url"] = url
