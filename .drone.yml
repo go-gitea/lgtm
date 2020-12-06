@@ -79,6 +79,8 @@ steps:
     GOSUMDB: sum.golang.org
     CGO_ENABLED: 1
   when:
+    branch:
+    - master
     event:
     - push
     - tag
