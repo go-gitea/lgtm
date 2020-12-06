@@ -67,19 +67,6 @@ steps:
     - push
     - pull_request
 
-- name: updater
-  pull: always
-  image: appleboy/golang-testing:1.9.2
-  commands:
-  - make release
-  environment:
-    GOPATH: /srv/app
-  when:
-    branch:
-    - master
-    event:
-    - push
-
 - name: docker
   pull: always
   image: plugins/docker:17.05
