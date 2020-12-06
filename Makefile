@@ -70,7 +70,7 @@ golangci-lint:
 
 .PHONY: test
 test:
-	go test -mod=vendor -cover -coverprofile $$GOPATH/src/$$PKG/coverage.out $(PACKAGES) || exit 1
+	go test -mod=vendor -cover -coverprofile coverage.out $(PACKAGES) || exit 1
 
 .PHONY: check
 check: test
