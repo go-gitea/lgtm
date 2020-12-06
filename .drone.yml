@@ -69,7 +69,7 @@ steps:
 
 - name: build
   pull: always
-  image: golang:1.15
+  image: golang:1.15-alpine
   commands:
   - make clean build
   settings:
