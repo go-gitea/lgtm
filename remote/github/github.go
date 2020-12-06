@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 	"time"
 
 	"github.com/go-gitea/lgtm/model"
@@ -304,6 +305,11 @@ func (g *Github) GetComments(c context.Context, u *model.User, r *model.Repo, nu
 	if err != nil {
 		return nil, err
 	}
+
+	sort.SliceStable(apiComments, func(i, j int) bool {
+		return apiComments[i].CreatedAt.After(*apiComments[j].CreatedAt)
+	})
+
 	comments := []*model.Comment{}
 	for _, comment := range apiComments {
 		comments = append(comments, &model.Comment{
@@ -311,8 +317,6 @@ func (g *Github) GetComments(c context.Context, u *model.User, r *model.Repo, nu
 			Body:   *comment.Body,
 		})
 	}
-
-	// TODO: make sure they are sorted Direction: "desc", Sort: "created"
 
 	return comments, nil
 }
