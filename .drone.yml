@@ -157,6 +157,7 @@ services:
   when:
     event:
     - push
+    - pull_request
 
 - name: pgsql
   pull: default
@@ -166,3 +167,4 @@ services:
   when:
     event:
     - push
+    - pull_request
