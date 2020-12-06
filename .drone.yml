@@ -1,149 +1,166 @@
+---
+kind: pipeline
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
 workspace:
-  base: /srv/app
+  base: /go
   path: src/github.com/go-gitea/lgtm
 
-pipeline:
-  test:
-    image: webhippie/golang:edge
-    pull: true
+steps:
+- name: test
+  pull: always
+  image: golang:1.15
+  commands:
+  - make clean
+  - make vet
+  #- make lint
+  - make test
+  - make build
+  settings:
     group: testing
-    environment:
-      GOPATH: /srv/app
-      CGO_ENABLED: "1"
-    commands:
-      - make clean
-      - make vet
-      - make lint
-      - make test
-      - make build
-    when:
-      event: [ push, tag, pull_request ]
+  environment:
+    GOPROXY: https://goproxy.cn # proxy.golang.org is blocked in China, this proxy is not
+    GOSUMDB: sum.golang.org
+    CGO_ENABLED: 1
+  when:
+    event:
+    - push
+    - tag
+    - pull_request
 
-  test-mysql:
-    image: webhippie/golang:edge
-    pull: true
+- name: test-mysql
+  pull: always
+  image: golang:1.15
+  commands:
+  - make test-mysql
+  settings:
     group: testing
-    commands:
-      - make test-mysql
-    when:
-      event: [ push ]
+  when:
+    event:
+    - push
 
-  test-pgsql:
-    image: webhippie/golang:edge
-    pull: true
+- name: test-pgsql
+  pull: always
+  image: golang:1.15
+  commands:
+  - make test-pgsql
+  settings:
     group: testing
-    commands:
-      - make test-pgsql
-    when:
-      event: [ push ]
+  when:
+    event:
+    - push
 
-  coverage:
-    image: plugins/codecov
-    name: ${DRONE_REPO}
-    secrets: [ codecov_token ]
-    when:
-      event: [ push, pull_request ]
+- name: coverage
+  pull: default
+  image: plugins/codecov
+  environment:
+    CODECOV_TOKEN:
+      from_secret: codecov_token
+  when:
+    event:
+    - push
+    - pull_request
 
-  updater:
-    image: appleboy/golang-testing:1.9.2
-    pull: true
-    environment:
-      GOPATH: /srv/app
-    commands:
-      - make release
-    when:
-      event: [ tag ]
+- name: updater
+  pull: always
+  image: appleboy/golang-testing:1.9.2
+  commands:
+  - make release
+  environment:
+    GOPATH: /srv/app
+  when:
+    branch:
+    - master
+    event:
+    - push
 
-  updater:
-    image: appleboy/golang-testing:1.9.2
-    pull: true
-    environment:
-      GOPATH: /srv/app
-    commands:
-      - make release
-    when:
-      event: [ push ]
-      branch: [ master ]
-
-  docker:
-    image: plugins/docker:17.05
-    pull: true
-    secrets: [ docker_username, docker_password ]
+- name: docker
+  pull: always
+  image: plugins/docker:17.05
+  settings:
     group: release
     repo: gitea/lgtm
-    auto_tag: true
-    dockerfile: Dockerfile
-    when:
-      event: [ push, tag ]
+  environment:
+    DOCKER_PASSWORD:
+      from_secret: docker_password
+    DOCKER_USERNAME:
+      from_secret: docker_username
+  when:
+    branch:
+    - master
+    event:
+    - push
 
-  docker:
-    image: plugins/docker:17.05
-    pull: true
-    secrets: [ docker_username, docker_password ]
-    group: release
-    repo: gitea/lgtm
-    when:
-      event: [ push ]
-      branch: [ master ]
-
-  release:
-    image: plugins/s3:1
-    pull: true
-    group: release
-    secrets: [ aws_access_key_id, aws_secret_access_key ]
+- name: release
+  pull: always
+  image: plugins/s3:1
+  settings:
     bucket: releases
     endpoint: https://storage.gitea.io
-    path_style: true
-    strip_prefix: dist/release/
-    source: dist/release/*
-    target: /lgtm/master
-    when:
-      event: [ push ]
-      branch: [ master ]
-
-  release:
-    image: plugins/s3:1
-    pull: true
     group: release
-    secrets: [ aws_access_key_id, aws_secret_access_key ]
-    bucket: releases
-    endpoint: https://storage.gitea.io
     path_style: true
+    source: "dist/release/*"
     strip_prefix: dist/release/
-    source: dist/release/*
-    target: /lgtm/${DRONE_TAG##v}
-    when:
-      event: [ tag ]
+    target: "/lgtm/${DRONE_TAG##v}"
+  environment:
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key_id
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+  when:
+    event:
+    - tag
 
-  github:
-    image: plugins/github-release:1
-    pull: true
-    group: release
-    secrets: [ github_token ]
+- name: github
+  pull: always
+  image: plugins/github-release:1
+  settings:
     files:
-      - dist/release/*
-    when:
-      event: [ tag ]
+    - "dist/release/*"
+    group: release
+  environment:
+    GITHUB_TOKEN:
+      from_secret: github_token
+  when:
+    event:
+    - tag
 
-  discord:
-    image: appleboy/drone-discord
-    secrets: [ discord_webhook_id, discord_webhook_token ]
-    when:
-      event: [ push, tag, pull_request ]
-      status: [ changed, failure ]
+- name: discord
+  pull: default
+  image: appleboy/drone-discord
+  environment:
+    DISCORD_WEBHOOK_ID:
+      from_secret: discord_webhook_id
+    DISCORD_WEBHOOK_TOKEN:
+      from_secret: discord_webhook_token
+  when:
+    event:
+    - push
+    - tag
+    status:
+    - changed
+    - failure
 
 services:
-  mysql:
-    image: mysql:5.7
-    environment:
-      - MYSQL_DATABASE=test
-      - MYSQL_ALLOW_EMPTY_PASSWORD=yes
-    when:
-      event: [ push ]
+- name: mysql
+  pull: default
+  image: mysql:5.7
+  environment:
+    MYSQL_ALLOW_EMPTY_PASSWORD: yes
+    MYSQL_DATABASE: test
+  when:
+    event:
+    - push
 
-  pgsql:
-    image: postgres:9.5
-    environment:
-      - POSTGRES_DB=test
-    when:
-      event: [ push ]
+- name: pgsql
+  pull: default
+  image: postgres:9.5
+  environment:
+    POSTGRES_DB: test
+  when:
+    event:
+    - push

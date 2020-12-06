@@ -11,7 +11,7 @@ LDFLAGS += -X "github.com/go-gitea/lgtm/version.VersionDev=$(SHA)"
 
 TARGETS ?= linux darwin windows
 ARCHS ?= amd64 386
-PACKAGES ?= $(shell go list ./... | grep -v /vendor/)
+PACKAGES ?= $(shell go list -mod=vendor ./... | grep -v /vendor/)
 
 ifneq ($(shell uname), Darwin)
 	EXTLDFLAGS = -extldflags "-static" $(null)
@@ -58,15 +58,19 @@ vet:
 	go vet $(PACKAGES)
 
 .PHONY: lint
-lint:
-	@which golint > /dev/null; if [ $$? -ne 0 ]; then \
-		go get -u github.com/golang/lint/golint; \
+lint: golangci-lint
+
+.PHONY: golangci-lint
+golangci-lint:
+	@hash golangci-lint > /dev/null 2>&1; if [ $$? -ne 0 ]; then \
+		export BINARY="golangci-lint"; \
+		curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(GOPATH)/bin v1.31.0; \
 	fi
-	for PKG in $(PACKAGES); do golint -set_exit_status $$PKG || exit 1; done;
+	golangci-lint run --timeout 5m
 
 .PHONY: test
 test:
-	for PKG in $(PACKAGES); do go test -cover -coverprofile $$GOPATH/src/$$PKG/coverage.out $$PKG || exit 1; done;
+	go test -mod=vendor -cover -coverprofile coverage.out $(PACKAGES) || exit 1
 
 .PHONY: check
 check: test
@@ -87,7 +91,7 @@ install: $(SOURCES)
 build: $(BIN)/$(EXECUTABLE)
 
 $(BIN)/$(EXECUTABLE): $(SOURCES)
-	go build -v -tags '$(TAGS)' -ldflags '-s -w $(LDFLAGS)' -o $@
+	go build -mod=vendor -v -tags '$(TAGS)' -ldflags '-s -w $(LDFLAGS)' -o $@
 
 release: release-dirs release-build release-copy release-check
 

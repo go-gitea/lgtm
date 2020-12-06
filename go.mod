@@ -7,7 +7,7 @@ require (
 	github.com/Sirupsen/logrus v0.6.7-0.20150309155839-2cea0f0d141f
 	github.com/dgrijalva/jwt-go v2.2.1-0.20150401180636-c48cfd5d9711+incompatible
 	github.com/elazarl/go-bindata-assetfs v0.0.0-20150414184409-bea323321994
-	github.com/franela/goblin v0.0.0-20150112000940-2042c4d610d2
+	github.com/franela/goblin v0.0.0-20201006155558-6240afcb2eb7
 	github.com/gin-gonic/contrib v0.0.0-20150815172543-14f66d54cdb9
 	github.com/gin-gonic/gin v0.0.0-20160414233928-5caaac4c5c71
 	github.com/go-sql-driver/mysql v1.2.1-0.20151112163355-d512f204a577

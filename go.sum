@@ -8,6 +8,8 @@ github.com/elazarl/go-bindata-assetfs v0.0.0-20150414184409-bea323321994 h1:6Ygv
 github.com/elazarl/go-bindata-assetfs v0.0.0-20150414184409-bea323321994/go.mod h1:v+YaWX3bdea5J/mo8dSETolEo7R71Vk1u8bnjau5yw4=
 github.com/franela/goblin v0.0.0-20150112000940-2042c4d610d2 h1:PcbwRGOqYeTQw76GRthRaxNGII82C/kx46ll3aNqDMQ=
 github.com/franela/goblin v0.0.0-20150112000940-2042c4d610d2/go.mod h1:7dvUGVsVBjqR7JHJk0brhHOZYGmfBYOrK0ZhYMEtBr4=
+github.com/franela/goblin v0.0.0-20201006155558-6240afcb2eb7 h1:eUae9KtuHjNg5e7DYkn57S/M/ndIICmV1bWs9ejYCx4=
+github.com/franela/goblin v0.0.0-20201006155558-6240afcb2eb7/go.mod h1:VzmDKDJVZI3aJmnRI9VjAn9nJ8qPPsN1fqzr9dqInIo=
 github.com/gin-gonic/contrib v0.0.0-20150815172543-14f66d54cdb9 h1:gISPkiYdlRqAEbns25dOAoT/w5dxhI4ACWUYfTr3dFQ=
 github.com/gin-gonic/contrib v0.0.0-20150815172543-14f66d54cdb9/go.mod h1:iqneQ2Df3omzIVTkIfn7c1acsVnMGiSLn4XF5Blh3Yg=
 github.com/gin-gonic/gin v0.0.0-20160414233928-5caaac4c5c71 h1:ML+SQEYkMC4dDaXPRUyIOI0mbbXBdIvquVspxzzJ54E=
