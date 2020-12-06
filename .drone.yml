@@ -69,9 +69,10 @@ steps:
 
 - name: build
   pull: always
-  image: golang:1.15
+  image: alpine:3.12
   commands:
-  - make build
+  - apk add go make
+  - make clean build
   settings:
     group: release
   environment:
@@ -84,7 +85,6 @@ steps:
     event:
     - push
     - tag
-    - pull_request
 
 - name: docker
   pull: always
