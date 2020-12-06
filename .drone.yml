@@ -141,7 +141,6 @@ steps:
     event:
     - push
     - tag
-    - pull_request
     status:
     - changed
     - failure
