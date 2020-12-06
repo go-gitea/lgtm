@@ -69,9 +69,8 @@ steps:
 
 - name: build
   pull: always
-  image: alpine:3.12
+  image: golang:1.15
   commands:
-  - apk add go make
   - make clean build
   settings:
     group: release
