@@ -42,6 +42,7 @@ steps:
   when:
     event:
     - push
+    - pull_request
 
 - name: test-pgsql
   pull: always
@@ -53,6 +54,7 @@ steps:
   when:
     event:
     - push
+    - pull_request
 
 - name: coverage
   pull: default
