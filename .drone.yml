@@ -14,7 +14,7 @@ steps:
   - apk add --no-cache make git gcc build-base
   - make clean
   - make vet
-  #- make lint
+  - make lint
   - make test
   - make build
   settings:
