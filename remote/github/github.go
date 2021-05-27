@@ -8,7 +8,7 @@ import (
 
 	"github.com/go-gitea/lgtm/model"
 	"github.com/go-gitea/lgtm/shared/httputil"
-	"github.com/google/go-github/v33/github"
+	"github.com/google/go-github/v35/github"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"golang.org/x/oauth2"

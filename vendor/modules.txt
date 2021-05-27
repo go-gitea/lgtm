@@ -38,9 +38,9 @@ github.com/go-sql-driver/mysql
 # github.com/golang/protobuf v1.4.3
 ## explicit
 github.com/golang/protobuf/proto
-# github.com/google/go-github/v33 v33.0.0
+# github.com/google/go-github/v35 v35.2.0
 ## explicit
-github.com/google/go-github/v33/github
+github.com/google/go-github/v35/github
 # github.com/google/go-querystring v1.0.0
 github.com/google/go-querystring/query
 # github.com/ianschenck/envflag v0.0.0-20140720210342-9111d830d133
