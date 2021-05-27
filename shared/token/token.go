@@ -33,8 +33,8 @@ type Token struct {
 	Text string
 }
 
-// Parse parses a raw JWT.
-func Parse(raw string, fn SecretFunc) (*Token, error) {
+// parse parses a raw JWT.
+func parse(raw string, fn SecretFunc) (*Token, error) {
 	token := &Token{}
 	parsed, err := jwt.Parse(raw, keyFunc(token, fn))
 	if err != nil {
@@ -54,14 +54,14 @@ func ParseRequest(r *http.Request, fn SecretFunc) (*Token, error) {
 	if len(token) != 0 {
 		token = r.Header.Get("Authorization")
 		fmt.Sscanf(token, "Bearer %s", &token)
-		return Parse(token, fn)
+		return parse(token, fn)
 	}
 
 	// then we attempt to get the token from the
 	// access_token url query parameter
 	token = r.FormValue("access_token")
 	if len(token) != 0 {
-		return Parse(token, fn)
+		return parse(token, fn)
 	}
 
 	// and finally we attempt to get the token from
@@ -70,7 +70,7 @@ func ParseRequest(r *http.Request, fn SecretFunc) (*Token, error) {
 	if err != nil {
 		return nil, err
 	}
-	return Parse(cookie.Value, fn)
+	return parse(cookie.Value, fn)
 }
 
 // CheckCsrf checks the validity of the JWT.
@@ -85,7 +85,7 @@ func CheckCsrf(r *http.Request, fn SecretFunc) error {
 
 	// parse the raw CSRF token value and validate
 	raw := r.Header.Get("X-CSRF-TOKEN")
-	_, err := Parse(raw, fn)
+	_, err := parse(raw, fn)
 	return err
 }
 
@@ -104,11 +104,13 @@ func (t *Token) Sign(secret string) (string, error) {
 // with an expiration date.
 func (t *Token) SignExpires(secret string, exp int64) (string, error) {
 	token := jwt.New(jwt.SigningMethodHS256)
-	token.Claims["type"] = t.Kind
-	token.Claims["text"] = t.Text
+	mapClaims := make(jwt.MapClaims)
+	mapClaims["type"] = t.Kind
+	mapClaims["text"] = t.Text
 	if exp > 0 {
-		token.Claims["exp"] = float64(exp)
+		mapClaims["exp"] = float64(exp)
 	}
+	token.Claims = mapClaims
 	return token.SignedString([]byte(secret))
 }
 
@@ -119,9 +121,14 @@ func keyFunc(token *Token, fn SecretFunc) jwt.Keyfunc {
 			return nil, jwt.ErrSignatureInvalid
 		}
 
+		mapClaims, isMapClaims := t.Claims.(jwt.MapClaims)
+		if !isMapClaims {
+			return nil, fmt.Errorf("token claims are not stored as map")
+		}
+
 		// extract the token kind and cast to
 		// the expected type.
-		kindv, ok := t.Claims["type"]
+		kindv, ok := mapClaims["type"]
 		if !ok {
 			return nil, jwt.ValidationError{}
 		}
@@ -129,7 +136,7 @@ func keyFunc(token *Token, fn SecretFunc) jwt.Keyfunc {
 
 		// extract the token value and cast to
 		// exepected type.
-		textv, ok := t.Claims["text"]
+		textv, ok := mapClaims["text"]
 		if !ok {
 			return nil, jwt.ValidationError{}
 		}
