@@ -6,15 +6,12 @@ platform:
   os: linux
   arch: amd64
 
-workspace:
-  base: /go
-  path: src/github.com/go-gitea/lgtm
-
 steps:
 - name: test
   pull: always
-  image: golang:1.15
+  image: golang:1.15-alpine
   commands:
+  - apk add --no-cache make git gcc build-base
   - make clean
   - make vet
   #- make lint
@@ -34,25 +31,29 @@ steps:
 
 - name: test-mysql
   pull: always
-  image: golang:1.15
+  image: golang:1.15-alpine
   commands:
+  - apk add --no-cache make git gcc build-base
   - make test-mysql
   settings:
     group: testing
   when:
     event:
     - push
+    - pull_request
 
 - name: test-pgsql
   pull: always
-  image: golang:1.15
+  image: golang:1.15-alpine
   commands:
+  - apk add --no-cache make git gcc build-base
   - make test-pgsql
   settings:
     group: testing
   when:
     event:
     - push
+    - pull_request
 
 - name: coverage
   pull: default
@@ -65,22 +66,28 @@ steps:
     - push
     - pull_request
 
-- name: updater
+- name: build
   pull: always
-  image: appleboy/golang-testing:1.9.2
+  image: golang:1.15-alpine
   commands:
-  - make release
+  - apk add --no-cache make git gcc build-base
+  - make clean build
+  settings:
+    group: release
   environment:
-    GOPATH: /srv/app
+    GOPROXY: https://goproxy.cn # proxy.golang.org is blocked in China, this proxy is not
+    GOSUMDB: sum.golang.org
+    CGO_ENABLED: 1
   when:
     branch:
     - master
     event:
     - push
+    - tag
 
 - name: docker
   pull: always
-  image: plugins/docker:17.05
+  image: plugins/docker:latest
   settings:
     group: release
     repo: gitea/lgtm
@@ -94,40 +101,6 @@ steps:
     - master
     event:
     - push
-
-- name: release
-  pull: always
-  image: plugins/s3:1
-  settings:
-    bucket: releases
-    endpoint: https://storage.gitea.io
-    group: release
-    path_style: true
-    source: "dist/release/*"
-    strip_prefix: dist/release/
-    target: "/lgtm/${DRONE_TAG##v}"
-  environment:
-    AWS_ACCESS_KEY_ID:
-      from_secret: aws_access_key_id
-    AWS_SECRET_ACCESS_KEY:
-      from_secret: aws_secret_access_key
-  when:
-    event:
-    - tag
-
-- name: github
-  pull: always
-  image: plugins/github-release:1
-  settings:
-    files:
-    - "dist/release/*"
-    group: release
-  environment:
-    GITHUB_TOKEN:
-      from_secret: github_token
-  when:
-    event:
-    - tag
 
 - name: discord
   pull: default
@@ -155,12 +128,16 @@ services:
   when:
     event:
     - push
+    - pull_request
 
 - name: pgsql
   pull: default
   image: postgres:9.5
   environment:
     POSTGRES_DB: test
+    POSTGRES_PASSWORD: test
+    POSTGRES_HOST_AUTH_METHOD: trust
   when:
     event:
     - push
+    - pull_request
